@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: WebFluxTodo
+  r2dbc:
+    url: r2dbc:postgresql://192.168.0.237:5432/webflux
+    username: chakri
+    password: chakripwd
+  sql:
+    init:
+      mode: always  # optional: useful for loading schema/data at startup
+
+# Optional server settings
+server:
+  port: 8060
+
+# Logging config (optional but helpful during dev)
+logging:
+  level:
+    org.springframework.r2dbc: DEBUG
+    io.r2dbc.postgresql: DEBUG
