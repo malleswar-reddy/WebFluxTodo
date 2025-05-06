@@ -1,9 +1,8 @@
 pipeline {
     agent any
-
-    environment {
-        JAVA_HOME = tool 'JDK_17'   // make sure JDK_17 is configured in Jenkins tools
-        PATH = "${JAVA_HOME}/bin:${env.PATH}"
+    tools {
+        maven 'Maven' // Must match the name in Global Tool Configuration
+        jdk 'JDK'     // Must match the name in Global Tool Configuration
     }
 
     stages {
