@@ -26,6 +26,7 @@ configure(subprojects.findAll { it.name in ['UserManagement'] }) {
     apply plugin: 'io.spring.dependency-management'
 
     dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
         implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
         implementation 'org.springframework.boot:spring-boot-starter-webflux'
         compileOnly 'org.projectlombok:lombok'
@@ -35,6 +36,7 @@ configure(subprojects.findAll { it.name in ['UserManagement'] }) {
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
         testImplementation 'io.projectreactor:reactor-test'
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
         implementation project(':CommonService')
     }
 }

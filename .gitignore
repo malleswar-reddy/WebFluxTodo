@@ -25,9 +25,5 @@ replay_pid*
 #gradle
 .gradle
 /build/
-/CommonService/build/tmp/jar/MANIFEST.MF
-/UserManagement/build/tmp/bootJar/MANIFEST.MF
-/UserManagement/build/tmp/jar/MANIFEST.MF
-/CommonService/build/tmp/compileJava/previous-compilation-data.bin
-/UserManagement/build/tmp/compileJava/previous-compilation-data.bin
 /UserManagement/build/resolvedMainClassName
+*/build/tmp/*

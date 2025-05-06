@@ -2,7 +2,8 @@ spring:
   application:
     name: WebFluxTodo
   r2dbc:
-    url: r2dbc:postgresql://192.168.0.237:5432/webflux
+#    url: r2dbc:postgresql://192.168.0.237:5432/webflux
+    url: r2dbc:postgresql://192.168.0.237:5432/test_demo
     username: chakri
     password: chakripwd
   sql:
@@ -18,3 +19,4 @@ logging:
   level:
     org.springframework.r2dbc: DEBUG
     io.r2dbc.postgresql: DEBUG
+    org.springframework.data.r2dbc: DEBUG
