@@ -1,0 +1,24 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.webflux'
+version = '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+springBoot {
+    mainClass = 'com.webflux.UserManagementApplication'
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    // other dependencies are added from root gradle, no need to repeat
+}
+
+test {
+    useJUnitPlatform()
+}

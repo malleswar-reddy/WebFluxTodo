@@ -1,45 +1,41 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.4.5'
+    id 'org.springframework.boot' version '3.4.5' apply false // ✅ Don't apply it at root
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
-springBoot {
-    mainClass = 'com.webflux.WebFluxTodoApplication'
-}
-
-
-group = 'com.webflux'
-version = '0.0.1-SNAPSHOT'
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+allprojects {
+    group = 'com.webflux'
+    version = '0.0.1-SNAPSHOT'
+    repositories {
+        mavenCentral()
     }
 }
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
+subprojects {
+    apply plugin: 'java'
+    sourceCompatibility = '17'
+    dependencies {
+        testImplementation 'org.junit.jupiter:junit-jupiter:5.10.3'
     }
 }
 
-repositories {
-    mavenCentral()
+// Apply Spring Boot only to child-project1 and child-project2
+configure(subprojects.findAll { it.name in ['UserManagement'] }) {
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+        implementation 'org.springframework.boot:spring-boot-starter-webflux'
+        compileOnly 'org.projectlombok:lombok'
+        runtimeOnly 'org.postgresql:postgresql'
+        runtimeOnly 'org.postgresql:r2dbc-postgresql'
+        annotationProcessor 'org.projectlombok:lombok'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testImplementation 'io.projectreactor:reactor-test'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+        implementation project(':CommonService')
+    }
 }
 
-dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    compileOnly 'org.projectlombok:lombok'
-    runtimeOnly 'org.postgresql:postgresql'
-    runtimeOnly 'org.postgresql:r2dbc-postgresql'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'io.projectreactor:reactor-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
-
-tasks.named('test') {
-    useJUnitPlatform()
-}
