@@ -30,3 +30,4 @@ replay_pid*
 */build/reports/*
 */build/test-results/*
 */build/jacoco/test.exec
+/Learn-Readme/Learn-Readme.iml
