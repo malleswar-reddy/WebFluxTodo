@@ -46,13 +46,7 @@ pipeline {
         stage('Coverage Report') {
             steps {
                 sh './gradlew jacocoTestReport --no-daemon'
-                jacoco(
-                    execPattern: '**/**/build/jacoco/*.exec', // Adjusted path to be more inclusive
-                    classPattern: '**/**/build/classes/java/main', // Adjusted path
-                    sourcePattern: '**/**/src/main/java', // Adjusted path
-                    inclusionPattern: '**/*.class', // Optional: Include all classes
-                    exclusionPattern: '**/*Test*.class' // Optional: Exclude test classes
-                )
+                jacoco(execPattern: '**/build/jacoco/test.exec')
             }
         }
 
