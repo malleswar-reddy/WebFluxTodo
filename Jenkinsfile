@@ -51,8 +51,7 @@ pipeline {
                     classPattern: '**/build/classes/java/main',
                     sourcePattern: '**/src/main/java',
                     exclusionPattern: '**/model/**,**/dto/**',
-                    lineCoverageMinimum: '0.80',
-                    lineCoverageMaximum: '1.00'
+                    minimumCoverage: '0.80'
                 )
             }
         }
