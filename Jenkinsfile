@@ -14,9 +14,9 @@ pipeline {
             steps {
                 script {
                     try {
-                        git url: 'https://github.com/malleswar-reddy/WebFluxTodo.git', branch: 'devlop'
+                        git url: 'https://github.com/malleswar-reddy/WebFluxTodo.git', branch: 'develop' // Fixed typo
                     } catch (Exception e) {
-                        error "Failed to checkout branch 'devlop': ${e.message}"
+                        error "Failed to checkout branch 'develop': ${e.message}"
                     }
                 }
             }
@@ -47,9 +47,11 @@ pipeline {
             steps {
                 sh './gradlew jacocoTestReport --no-daemon'
                 jacoco(
-                    execPattern: '**/build/jacoco/test.exec',
-                    classPattern: '**/build/classes/java/main',
-                    sourcePattern: '**/src/main/java'
+                    execPattern: '**/**/build/jacoco/*.exec', // Adjusted path to be more inclusive
+                    classPattern: '**/**/build/classes/java/main', // Adjusted path
+                    sourcePattern: '**/**/src/main/java', // Adjusted path
+                    inclusionPattern: '**/*.class', // Optional: Include all classes
+                    exclusionPattern: '**/*Test*.class' // Optional: Exclude test classes
                 )
             }
         }
@@ -57,7 +59,7 @@ pipeline {
         stage('Package') {
             steps {
                 sh './gradlew bootJar --no-daemon'
-                archiveArtifacts artifacts: '**/build/libs/*.jar', fingerprint: true
+                archiveArtifacts artifacts: '**/build/libs/*.jar', fingerprint Wrote: true
             }
         }
     }
