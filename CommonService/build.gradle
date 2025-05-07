@@ -1,5 +1,18 @@
 plugins {
     id 'java'
+    id 'jacoco'
+}
+
+jacoco {
+    toolVersion = "0.8.10" // Use the latest version
+}
+
+tasks.jacocoTestReport {
+    dependsOn test // Ensure tests run before generating the report
+    reports {
+        xml.required = true
+        html.required = true
+    }
 }
 
 group = 'com.webflux'

@@ -29,3 +29,4 @@ replay_pid*
 */build/tmp/*
 */build/reports/*
 */build/test-results/*
+/CommonService/build/jacoco/test.exec
