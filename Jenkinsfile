@@ -63,7 +63,8 @@ pipeline {
                 allowMissing: false,
                 alwaysLinkToLastBuild: true,
                 keepAll: true,
-                reportDir: 'build/reports/jacoco',
+//                 reportDir: 'build/reports/jacoco',
+                reportDir: ['UserManagement/build/reports/jacoco', 'CommonService/build/reports/jacoco'],
                 reportFiles: 'index.html',
                 reportName: 'JaCoCo Coverage Report'
             ])
