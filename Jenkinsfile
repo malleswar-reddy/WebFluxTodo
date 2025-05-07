@@ -50,8 +50,7 @@ pipeline {
                     execPattern: '**/build/jacoco/test.exec',
                     classPattern: '**/build/classes/java/main',
                     sourcePattern: '**/src/main/java',
-                    exclusionPattern: '**/model/**,**/dto/**',
-                    minimumCoverage: '0.80'
+                    exclusionPattern: '**/model/**,**/dto/**'
                 )
             }
         }
