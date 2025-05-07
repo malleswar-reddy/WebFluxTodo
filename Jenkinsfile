@@ -59,7 +59,7 @@ pipeline {
         stage('Package') {
             steps {
                 sh './gradlew bootJar --no-daemon'
-                archiveArtifacts artifacts: '**/build/libs/*.jar', fingerprint Wrote: true
+//                 archiveArtifacts artifacts: '**/build/libs/*.jar', fingerprint Wrote: true
             }
         }
     }
