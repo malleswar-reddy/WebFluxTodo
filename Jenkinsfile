@@ -50,14 +50,20 @@ pipeline {
             }
         }
 
-
-        //stage('Package') {
-         //   steps {
-         //       sh './gradlew bootJar --no-daemon'
-//                 archiveArtifacts artifacts: '**/build/libs/*.jar', fingerprint Wrote: true
-         //   }
-      //  }
+post {
+    always {
+//         cleanWs() // Clean workspace after build
+        publishHTML(target: [
+            allowMissing: false,
+            alwaysLinkToLastBuild: true,
+            keepAll: true,
+            reportDir: 'build/reports/jacoco',
+            reportFiles: 'index.html',
+            reportName: 'JaCoCo Coverage Report'
+        ])
     }
+}
+
 
     /* post {
         always {

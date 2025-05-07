@@ -25,8 +25,8 @@ replay_pid*
 #gradle
 .gradle
 /build/
-#/UserManagement/build/resolvedMainClassName
+*/build/resolvedMainClassName
 */build/tmp/*
 */build/reports/*
 */build/test-results/*
-#/CommonService/build/jacoco/test.exec
+*/build/jacoco/test.exec
