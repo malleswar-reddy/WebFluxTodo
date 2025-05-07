@@ -5,22 +5,16 @@ plugins {
     id 'jacoco'
 }
 
-jacoco {
-    toolVersion = "0.8.10" // Use the latest version
-}
-
 jacocoTestReport {
     reports {
-        xml.required = true
-        html.required = true
-    }
-    afterEvaluate {
-        classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: ['**/model/**', '**/dto/**'])
-        }))
+        html.required.set(true) // Use 'required' instead of 'enabled'
     }
 }
 
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport // Report is always generated after tests run
+}
 
 allprojects {
     group = 'com.webflux'

@@ -14,7 +14,7 @@ pipeline {
             steps {
                 script {
                     try {
-                        git url: 'https://github.com/malleswar-reddy/WebFluxTodo.git', branch: 'develop' // Fixed typo
+                        git url: 'https://github.com/malleswar-reddy/WebFluxTodo.git', branch: 'devlop'
                     } catch (Exception e) {
                         error "Failed to checkout branch 'develop': ${e.message}"
                     }
