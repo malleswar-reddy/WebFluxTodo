@@ -13,10 +13,10 @@ public interface UserAuthRepository extends ReactiveCrudRepository<UserAuth, Lon
     Mono<UserAuth> findByEmail(String email);
 
     @Query("""
-        SELECT ua.user_id, ua.email, ua.password_hash, ua.email_verified, ua.created_at,
-               up.first_name, up.last_name, up.role, up.picture, up.phone, up.alternate_phone, up.exp
-        FROM user_auth ua
-        LEFT JOIN user_profile up ON ua.user_id = up.user_id
-        """)
+            SELECT ua.user_id, ua.email, ua.password_hash, ua.email_verified, ua.created_at,
+                   up.first_name, up.last_name, up.role, up.picture, up.phone, up.alternate_phone, up.exp
+            FROM user_auth ua
+            LEFT JOIN user_profile up ON ua.user_id = up.user_id
+            """)
     Flux<UserDTO> findAllWithProfile();
 }

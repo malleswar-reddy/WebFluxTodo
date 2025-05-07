@@ -5,11 +5,19 @@ import com.webflux.model.UserAuth;
 import com.webflux.model.UserProfile;
 import com.webflux.repository.UserAuthRepository;
 import com.webflux.repository.UserProfileRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import static com.webflux.utils.UserUtils.getUserAuth;
+import static com.webflux.utils.UserUtils.getUserProfile;
+import static com.webflux.utils.UserUtils.toUserDTO;
+import static com.webflux.utils.UserUtils.userAuthExtracted;
+import static com.webflux.utils.UserUtils.userProfileExtracted;
+
 @Service
+@Slf4j
 public class UserService {
 
     private final UserAuthRepository userAuthRepository;
@@ -22,22 +30,8 @@ public class UserService {
 
     // Create
     public Mono<UserDTO> createUser(UserDTO userDTO) {
-        UserAuth userAuth = new UserAuth();
-        userAuth.setUserId(userDTO.getUserId());
-        userAuth.setEmail(userDTO.getEmail());
-        userAuth.setPasswordHash(userDTO.getPasswordHash());
-        userAuth.setEmailVerified(userDTO.isEmailVerified());
-        userAuth.setCreatedAt(userDTO.getCreatedAt());
-
-        UserProfile userProfile = new UserProfile();
-        userProfile.setUserId(userDTO.getUserId());
-        userProfile.setFirstName(userDTO.getFirstName());
-        userProfile.setLastName(userDTO.getLastName());
-        userProfile.setRole(userDTO.getRole());
-        userProfile.setPicture(userDTO.getPicture());
-        userProfile.setPhone(userDTO.getPhone());
-        userProfile.setAlternatePhone(userDTO.getAlternatePhone());
-        userProfile.setExp(userDTO.getExp());
+        UserAuth userAuth = getUserAuth(userDTO);
+        UserProfile userProfile = getUserProfile(userDTO);
 
         return userAuthRepository.save(userAuth)
                 .flatMap(savedAuth -> userProfileRepository.save(userProfile)
@@ -61,22 +55,12 @@ public class UserService {
     public Mono<UserDTO> updateUser(Long id, UserDTO userDTO) {
         return userAuthRepository.findById(id)
                 .flatMap(existingAuth -> {
-                    existingAuth.setEmail(userDTO.getEmail());
-                    existingAuth.setPasswordHash(userDTO.getPasswordHash());
-                    existingAuth.setEmailVerified(userDTO.isEmailVerified());
-                    existingAuth.setCreatedAt(userDTO.getCreatedAt());
+                    userAuthExtracted(userDTO, existingAuth);
 
                     return userAuthRepository.save(existingAuth)
                             .then(userProfileRepository.findById(id))
                             .flatMap(existingProfile -> {
-                                existingProfile.setFirstName(userDTO.getFirstName());
-                                existingProfile.setLastName(userDTO.getLastName());
-                                existingProfile.setRole(userDTO.getRole());
-                                existingProfile.setPicture(userDTO.getPicture());
-                                existingProfile.setPhone(userDTO.getPhone());
-                                existingProfile.setAlternatePhone(userDTO.getAlternatePhone());
-                                existingProfile.setExp(userDTO.getExp());
-
+                                userProfileExtracted(userDTO, existingProfile);
                                 return userProfileRepository.save(existingProfile)
                                         .thenReturn(userDTO);
                             });
@@ -87,27 +71,5 @@ public class UserService {
     public Mono<Void> deleteUser(Long id) {
         return userProfileRepository.deleteById(id)
                 .then(userAuthRepository.deleteById(id));
-    }
-
-    // Helper method to convert to DTO
-    private UserDTO toUserDTO(UserAuth userAuth, UserProfile userProfile) {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setUserId(userAuth.getUserId());
-        userDTO.setEmail(userAuth.getEmail());
-        userDTO.setPasswordHash(userAuth.getPasswordHash());
-        userDTO.setEmailVerified(userAuth.isEmailVerified());
-        userDTO.setCreatedAt(userAuth.getCreatedAt());
-
-        if (userProfile != null) {
-            userDTO.setFirstName(userProfile.getFirstName());
-            userDTO.setLastName(userProfile.getLastName());
-            userDTO.setRole(userProfile.getRole());
-            userDTO.setPicture(userProfile.getPicture());
-            userDTO.setPhone(userProfile.getPhone());
-            userDTO.setAlternatePhone(userProfile.getAlternatePhone());
-            userDTO.setExp(userProfile.getExp());
-        }
-
-        return userDTO;
     }
 }
