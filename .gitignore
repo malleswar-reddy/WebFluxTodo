@@ -27,3 +27,5 @@ replay_pid*
 /build/
 /UserManagement/build/resolvedMainClassName
 */build/tmp/*
+*/build/reports/*
+*/build/test-results/*
