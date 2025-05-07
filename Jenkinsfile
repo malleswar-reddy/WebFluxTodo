@@ -2,7 +2,6 @@ pipeline {
     agent any
     tools {
         jdk 'JDK' // Must match the name in Global Tool Configuration
-        // Removed 'maven' as the project uses Gradle
     }
 
     environment {
@@ -13,7 +12,13 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/malleswar-reddy/WebFluxTodo.git', branch: 'develop'
+                script {
+                    try {
+                        git url: 'https://github.com/malleswar-reddy/WebFluxTodo.git', branch: 'devlop'
+                    } catch (Exception e) {
+                        error "Failed to checkout branch 'devlop': ${e.message}"
+                    }
+                }
             }
         }
 
@@ -46,8 +51,8 @@ pipeline {
                     classPattern: '**/build/classes/java/main',
                     sourcePattern: '**/src/main/java',
                     exclusionPattern: '**/model/**,**/dto/**',
-                    minimumLineCoverage: '0.80',
-                    maximumLineCoverage: '1.00'
+                    lineCoverageMinimum: '0.80',
+                    lineCoverageMaximum: '1.00'
                 )
             }
         }
@@ -64,12 +69,12 @@ pipeline {
         always {
             cleanWs() // Clean workspace after build
         }
-        /* success {
+        success {
             echo 'Build, tests, and packaging completed successfully.'
             emailext(
                 subject: "SUCCESS: WebFluxTodo Build #${env.BUILD_NUMBER}",
                 body: "The build and tests for WebFluxTodo succeeded.\n\nBuild URL: ${env.BUILD_URL}\nCoverage Report: ${env.BUILD_URL}jacoco/",
-                to: 'team@example.com',
+                to: 'team@example.com', // Replace with actual team email
                 attachLog: true
             )
         }
@@ -78,9 +83,9 @@ pipeline {
             emailext(
                 subject: "FAILURE: WebFluxTodo Build #${env.BUILD_NUMBER}",
                 body: "The build or tests for WebFluxTodo failed.\n\nBuild URL: ${env.BUILD_URL}\nCheck the logs for details.",
-                to: 'team@example.com',
+                to: 'team@example.com', // Replace with actual team email
                 attachLog: true
             )
-        } */
+        }
     }
 }
