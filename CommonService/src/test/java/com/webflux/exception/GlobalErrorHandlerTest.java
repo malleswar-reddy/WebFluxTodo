@@ -20,10 +20,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class GlobalErrorHandlerTest {
@@ -38,9 +35,6 @@ class GlobalErrorHandlerTest {
     private org.springframework.http.server.reactive.ServerHttpResponse response;
 
     @Mock
-    private org.springframework.web.server.WebExceptionHandler defaultExceptionHandler;
-
-    @Mock
     private org.springframework.core.io.buffer.DataBufferFactory dataBufferFactory;
 
     @Mock
@@ -51,14 +45,14 @@ class GlobalErrorHandlerTest {
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
-        when(exchange.getResponse()).thenReturn(response);
-        when(response.getHeaders()).thenReturn(new HttpHeaders());
-        when(response.bufferFactory()).thenReturn(dataBufferFactory);
     }
 
     @Test
     void handle_successfulErrorHandling() {
-        // Arrange
+        when(exchange.getResponse()).thenReturn(response);
+        when(response.getHeaders()).thenReturn(new HttpHeaders());
+        when(response.bufferFactory()).thenReturn(dataBufferFactory);
+
         String errorMessage = "Resource not found";
         Throwable exception = new RuntimeException(errorMessage);
         Map<String, String> expectedBody = Map.of("error", errorMessage);
@@ -66,25 +60,25 @@ class GlobalErrorHandlerTest {
         when(dataBufferFactory.wrap(any(byte[].class))).thenReturn(dataBuffer);
         when(response.writeWith(any(Mono.class))).thenReturn(Mono.empty());
 
-        // Act
         Mono<Void> result = globalErrorHandler.handle(exchange, exception);
 
-        // Assert
         StepVerifier.create(result)
                 .verifyComplete();
 
         verify(response).setStatusCode(HttpStatus.NOT_FOUND);
-        verify(response.getHeaders()).setContentType(MediaType.APPLICATION_JSON);
+        assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
         verify(dataBufferFactory).wrap(any(byte[].class));
         verify(response).writeWith(any(Mono.class));
     }
 
     @Test
     void handle_objectMapperFailure() throws JsonProcessingException {
-        // Arrange
+        when(exchange.getResponse()).thenReturn(response);
+        when(response.getHeaders()).thenReturn(new HttpHeaders());
+//        when(response.bufferFactory()).thenReturn(dataBufferFactory);
+
         Throwable exception = new RuntimeException("Resource not found");
 
-        // Simulate ObjectMapper failure
         ObjectMapper spyObjectMapper = spy(objectMapper);
         when(spyObjectMapper.writeValueAsBytes(any())).thenThrow(new RuntimeException("Serialization error"));
         globalErrorHandler = new GlobalErrorHandler() {
@@ -109,15 +103,13 @@ class GlobalErrorHandlerTest {
 
         when(response.setComplete()).thenReturn(Mono.empty());
 
-        // Act
         Mono<Void> result = globalErrorHandler.handle(exchange, exception);
 
-        // Assert
         StepVerifier.create(result)
                 .verifyComplete();
 
         verify(response).setStatusCode(HttpStatus.NOT_FOUND);
-        verify(response.getHeaders()).setContentType(MediaType.APPLICATION_JSON);
+        assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
         verify(response).setComplete();
         verify(dataBufferFactory, never()).wrap(any(byte[].class));
         verify(response, never()).writeWith(any(Mono.class));
@@ -125,7 +117,6 @@ class GlobalErrorHandlerTest {
 
     @Test
     void verifyOrderAnnotation() {
-        // Assert
         Order order = GlobalErrorHandler.class.getAnnotation(Order.class);
         assertEquals(-2, order.value(), "Order should be -2 to run before default handler");
     }
