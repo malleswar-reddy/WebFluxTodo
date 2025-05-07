@@ -48,8 +48,8 @@ pipeline {
                 sh './gradlew jacocoTestReport --no-daemon'
                 jacoco(
                     execPattern: '**/build/jacoco/test.exec',
-                    classPattern: '**/build/classes/java/main',
-                    sourcePattern: '**/src/main/java',
+                    classDirectories: '**/build/classes/java/main',
+                    sourceDirectories: '**/src/main/java',
                     exclusionPattern: '**/model/**,**/dto/**'
                 )
             }
