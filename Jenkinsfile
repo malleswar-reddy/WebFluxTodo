@@ -58,16 +58,23 @@ pipeline {
     }
 
     post {
-        always {
-            publishHTML(target: [
-                allowMissing: false,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
-//                 reportDir: 'build/reports/jacoco',
-                reportDir: ['UserManagement/build/reports/jacoco', 'CommonService/build/reports/jacoco'],
-                reportFiles: 'index.html',
-                reportName: 'JaCoCo Coverage Report'
-            ])
+            always {
+                publishHTML(target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'UserManagement/build/reports/tests/test',
+                    reportFiles: 'index.html',
+                    reportName: 'UserManagement Test Report'
+                ])
+                publishHTML(target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'CommonService/build/reports/jacoco/test/html',
+                    reportFiles: 'index.html',
+                    reportName: 'CommonService JaCoCo Coverage Report'
+                ])
+            }
         }
-    }
 }
