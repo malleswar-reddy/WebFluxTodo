@@ -56,36 +56,10 @@ pipeline {
             }
         }
     }
-
     post {
         always {
-            // Publish test and coverage reports
-            publishHTML(target: [
-                allowMissing: false,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
-                reportDir: 'UserManagement/build/reports/tests/test',
-                reportFiles: 'index.html',
-                reportName: 'UserManagement Test Report'
-            ])
-            publishHTML(target: [
-                allowMissing: false,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
-                reportDir: 'CommonService/build/reports/jacoco/test/html',
-                reportFiles: 'index.html',
-                reportName: 'CommonService JaCoCo Coverage Report'
-            ])
-            publishHTML(target: [
-                allowMissing: false,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
-                reportDir: 'UserManagement/build/reports/tests/test',
-                reportFiles: 'index.html',
-                reportName: 'UserManagement JaCoCo Coverage Report'
-            ])
-
             script {
+                // Define coverage variables inside script block
                 def getJacocoCoverage = { reportPath ->
                     if (fileExists(reportPath)) {
                         def xml = readFile(reportPath)
@@ -103,36 +77,34 @@ pipeline {
                     return 'N/A'
                 }
 
-                def commonCoverage = getJacocoCoverage('CommonService/build/reports/jacoco/test/jacocoTestReport.xml')
-                def userCoverage = getJacocoCoverage('UserManagement/build/reports/jacoco/test/jacocoTestReport.xml')
-
-                try {
-                    emailext(
-                        subject: "Jenkins Build todo ${currentBuild.currentResult}: Job ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                        body: """
-                            <h2>Build Status: ${currentBuild.currentResult}</h2>
-                            <p><strong>Job:</strong> ${env.JOB_NAME}</p>
-                            <p><strong>Build Number:</strong> ${env.BUILD_NUMBER}</p>
-                            <p><strong>Duration:</strong> ${currentBuild.durationString}</p>
-                            <h3>JaCoCo Test Coverage</h3>
-                            <p><strong>CommonService:</strong> Line Coverage: ${commonCoverage}%</p>
-                            <p><strong>UserManagement:</strong> Line Coverage: ${userCoverage}%</p>
-                            <p><a href="${env.BUILD_URL}artifact/CommonService/build/reports/jacoco/test/html/index.html">CommonService JaCoCo Report</a></p>
-                            <p><a href="${env.BUILD_URL}artifact/UserManagement/build/reports/tests/test/index.html">UserManagement JaCoCo Report</a></p>
-                            <p><a href="${env.BUILD_URL}testReport">View Test Reports</a></p>
-                            <p><a href="${env.BUILD_URL}console">View Console Output</a></p>
-                        """,
-                        to: 'malleswar.mca@gmail.com',
-                        mimeType: 'text/html',
-                        attachLog: false
-                    )
-                } catch (Exception e) {
-                    echo "Failed to send email: ${e.message}"
-                    currentBuild.result = 'UNSTABLE'
-                }
+                // Store values in environment vars for use outside script
+                env.COMMON_COVERAGE = getJacocoCoverage('CommonService/build/reports/jacoco/test/jacocoTestReport.xml')
+                env.USER_COVERAGE = getJacocoCoverage('UserManagement/build/reports/jacoco/test/jacocoTestReport.xml')
             }
+
+            // ✅ Move emailext outside the script block
+            emailext(
+                subject: "Jenkins Build todo ${currentBuild.currentResult}: Job ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                    <h2>Build Status: ${currentBuild.currentResult}</h2>
+                    <p><strong>Job:</strong> ${env.JOB_NAME}</p>
+                    <p><strong>Build Number:</strong> ${env.BUILD_NUMBER}</p>
+                    <p><strong>Duration:</strong> ${currentBuild.durationString}</p>
+                    <h3>JaCoCo Test Coverage</h3>
+                    <p><strong>CommonService:</strong> Line Coverage: ${env.COMMON_COVERAGE}%</p>
+                    <p><strong>UserManagement:</strong> Line Coverage: ${env.USER_COVERAGE}%</p>
+                    <p><a href="${env.BUILD_URL}artifact/CommonService/build/reports/jacoco/test/html/index.html">CommonService JaCoCo Report</a></p>
+                    <p><a href="${env.BUILD_URL}artifact/UserManagement/build/reports/tests/test/index.html">UserManagement JaCoCo Report</a></p>
+                    <p><a href="${env.BUILD_URL}testReport">View Test Reports</a></p>
+                    <p><a href="${env.BUILD_URL}console">View Console Output</a></p>
+                """,
+                to: 'malleswar.mca@gmail.com',
+                mimeType: 'text/html',
+                attachLog: false
+            )
         }
     }
+
 }
 //attachmentsPattern: 'CommonService/build/reports/jacoco/test/html/index.html,UserManagement/build/reports/tests/test/index.html'
 
