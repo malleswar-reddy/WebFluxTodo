@@ -97,14 +97,14 @@ pipeline {
                 <p><strong>CommonService:</strong> Line Coverage: ${getJacocoCoverage('CommonService/build/reports/jacoco/test/jacocoTestReport.xml')}%</p>
                 <p><strong>UserManagement:</strong> Line Coverage: ${getJacocoCoverage('UserManagement/build/reports/jacoco/test/jacocoTestReport.xml')}%</p>
                 <p><a href="${env.BUILD_URL}artifact/CommonService/build/reports/jacoco/test/html/index.html">CommonService JaCoCo Report</a></p>
-                <p><a href="${env.BUILD_URL}artifact/UserManagement/build/reports/jacoco/test/html/index.html">UserManagement JaCoCo Report</a></p>
+                <p><a href="${env.BUILD_URL}artifact/UserManagement/build/reports/tests/test/index.html">UserManagement JaCoCo Report</a></p>
                 <p><a href="${env.BUILD_URL}testReport">View Test Reports</a></p>
                 <p><a href="${env.BUILD_URL}console">View Console Output</a></p>
                 """,
                 to: 'malleswar.mca@gmail.com',
                 mimeType: 'text/html',
                 attachLog: false,
-                attachmentsPattern: 'CommonService/build/reports/jacoco/test/html/index.html,UserManagement/build/reports/jacoco/test/html/index.html'
+                attachmentsPattern: 'CommonService/build/reports/jacoco/test/html/index.html,UserManagement/build/reports/tests/test/index.html'
             )
         }
     }
