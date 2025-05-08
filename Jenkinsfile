@@ -14,9 +14,7 @@ pipeline {
             steps {
                 script {
                     try {
-                        git url: 'https://github.com/malleswar-reddy/WebFluxTodo.git',
-                            branch: 'devlop',
-                            credentialsId: 'github-pat' // Added credentials for private repo
+                        git url: 'https://github.com/malleswar-reddy/WebFluxTodo.git', branch: 'devlop'
                     } catch (Exception e) {
                         error "Failed to checkout branch 'devlop': ${e.message}"
                     }
@@ -48,16 +46,6 @@ pipeline {
         stage('Coverage Report') {
             steps {
                 sh './gradlew jacocoTestReport --no-daemon'
-                // Publish JaCoCo report in Jenkins UI for both modules
-                jacoco(
-                    execPattern: '**/build/jacoco/test.exec',
-                    classPattern: '**/build/classes/java/main',
-                    sourcePattern: '**/src/main/java',
-                    inclusionPattern: '**/*.class'
-                )
-                // Archive JaCoCo HTML reports for both modules
-                archiveArtifacts artifacts: 'CommonService/build/reports/jacoco/test/html/**,UserManagement/build/reports/jacoco/test/html/**',
-                                allowEmptyArchive: true
             }
         }
 
