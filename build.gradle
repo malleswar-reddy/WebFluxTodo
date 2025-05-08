@@ -5,9 +5,12 @@ plugins {
     id 'jacoco'
 }
 
+
+
 jacocoTestReport {
     reports {
         html.required.set(true) // Use 'required' instead of 'enabled'
+        xml.required.set(true) // Use 'required' instead of 'enabled'
     }
 }
 

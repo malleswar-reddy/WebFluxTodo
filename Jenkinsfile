@@ -80,7 +80,7 @@ pipeline {
                 allowMissing: false,
                 alwaysLinkToLastBuild: true,
                 keepAll: true,
-                reportDir: 'UserManagement/build/reports/jacoco/test/html',
+                reportDir: 'UserManagement/build/reports/tests/test',
                 reportFiles: 'index.html',
                 reportName: 'UserManagement JaCoCo Coverage Report'
             ])
