@@ -86,8 +86,11 @@ pipeline {
             ])
 
             // Send HTML email with build status and JaCoCo coverage for both modules
-            emailext(
-                subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+
+         script {
+              try {
+                emailext(
+                subject: "Jenkins Build todo ${currentBuild.currentResult}: Job ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 body: """
                 <h2>Build Status: ${currentBuild.currentResult}</h2>
                 <p><strong>Job:</strong> ${env.JOB_NAME}</p>
@@ -104,11 +107,16 @@ pipeline {
                 to: 'malleswar.mca@gmail.com',
                 mimeType: 'text/html',
                 attachLog: false,
-                attachmentsPattern: 'CommonService/build/reports/jacoco/test/html/index.html,UserManagement/build/reports/tests/test/index.html'
-            )
+                )
+            } catch (Exception e) {
+                echo "Failed to send email: ${e.message}"
+                currentBuild.result = 'UNSTABLE'
+            }
+          }
         }
     }
 }
+//attachmentsPattern: 'CommonService/build/reports/jacoco/test/html/index.html,UserManagement/build/reports/tests/test/index.html'
 
 // Helper function to extract JaCoCo line coverage
 def getJacocoCoverage(reportPath) {
