@@ -14,7 +14,9 @@ pipeline {
             steps {
                 script {
                     try {
-                        git url: 'https://github.com/malleswar-reddy/WebFluxTodo.git', branch: 'devlop'
+                        git url: 'https://github.com/malleswar-reddy/WebFluxTodo.git',
+                            branch: 'devlop',
+                            credentialsId: 'github-pat' // Added credentials for private repo
                     } catch (Exception e) {
                         error "Failed to checkout branch 'devlop': ${e.message}"
                     }
@@ -46,6 +48,16 @@ pipeline {
         stage('Coverage Report') {
             steps {
                 sh './gradlew jacocoTestReport --no-daemon'
+                // Publish JaCoCo report in Jenkins UI for both modules
+                jacoco(
+                    execPattern: '**/build/jacoco/test.exec',
+                    classPattern: '**/build/classes/java/main',
+                    sourcePattern: '**/src/main/java',
+                    inclusionPattern: '**/*.class'
+                )
+                // Archive JaCoCo HTML reports for both modules
+                archiveArtifacts artifacts: 'CommonService/build/reports/jacoco/test/html/**,UserManagement/build/reports/jacoco/test/html/**',
+                                allowEmptyArchive: true
             }
         }
 
@@ -58,23 +70,68 @@ pipeline {
     }
 
     post {
-            always {
-                publishHTML(target: [
-                    allowMissing: false,
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true,
-                    reportDir: 'UserManagement/build/reports/tests/test',
-                    reportFiles: 'index.html',
-                    reportName: 'UserManagement Test Report'
-                ])
-                publishHTML(target: [
-                    allowMissing: false,
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true,
-                    reportDir: 'CommonService/build/reports/jacoco/test/html',
-                    reportFiles: 'index.html',
-                    reportName: 'CommonService JaCoCo Coverage Report'
-                ])
-            }
+        always {
+            // Publish test and coverage reports
+            publishHTML(target: [
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'UserManagement/build/reports/tests/test',
+                reportFiles: 'index.html',
+                reportName: 'UserManagement Test Report'
+            ])
+            publishHTML(target: [
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'CommonService/build/reports/jacoco/test/html',
+                reportFiles: 'index.html',
+                reportName: 'CommonService JaCoCo Coverage Report'
+            ])
+            publishHTML(target: [
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'UserManagement/build/reports/jacoco/test/html',
+                reportFiles: 'index.html',
+                reportName: 'UserManagement JaCoCo Coverage Report'
+            ])
+
+            // Send HTML email with build status and JaCoCo coverage for both modules
+            emailext(
+                subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                <h2>Build Status: ${currentBuild.currentResult}</h2>
+                <p><strong>Job:</strong> ${env.JOB_NAME}</p>
+                <p><strong>Build Number:</strong> ${env.BUILD_NUMBER}</p>
+                <p><strong>Duration:</strong> ${currentBuild.durationString}</p>
+                <h3>JaCoCo Test Coverage</h3>
+                <p><strong>CommonService:</strong> Line Coverage: ${getJacocoCoverage('CommonService/build/reports/jacoco/test/jacocoTestReport.xml')}%</p>
+                <p><strong>UserManagement:</strong> Line Coverage: ${getJacocoCoverage('UserManagement/build/reports/jacoco/test/jacocoTestReport.xml')}%</p>
+                <p><a href="${env.BUILD_URL}artifact/CommonService/build/reports/jacoco/test/html/index.html">CommonService JaCoCo Report</a></p>
+                <p><a href="${env.BUILD_URL}artifact/UserManagement/build/reports/jacoco/test/html/index.html">UserManagement JaCoCo Report</a></p>
+                <p><a href="${env.BUILD_URL}testReport">View Test Reports</a></p>
+                <p><a href="${env.BUILD_URL}console">View Console Output</a></p>
+                """,
+                to: 'malleswar.mca@gmail.com',
+                mimeType: 'text/html',
+                attachLog: false,
+                attachmentsPattern: 'CommonService/build/reports/jacoco/test/html/index.html,UserManagement/build/reports/jacoco/test/html/index.html'
+            )
         }
+    }
+}
+
+// Helper function to extract JaCoCo line coverage
+def getJacocoCoverage(reportPath) {
+    if (fileExists(reportPath)) {
+        def xml = readFile(reportPath)
+        def matcher = xml =~ '<counter type="LINE" missed="\\d+" covered="(\\d+)"'
+        if (matcher.find()) {
+            def covered = matcher[0][1].toInteger()
+            def total = (xml =~ '<counter type="LINE" missed="(\\d+)" covered="(\\d+)"')[0][1].toInteger() + covered
+            return String.format("%.2f", (covered / total) * 100)
+        }
+    }
+    return 'N/A'
 }
