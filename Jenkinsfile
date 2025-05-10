@@ -123,7 +123,8 @@ pipeline {
                             <p><a href="${env.BUILD_URL}console">View Console Output</a></p>
                         """,
                        mimeType: 'text/html',
-                       to: 'malleswar.mca@gmail.com',
+                       to: 'malleswar.mca@gmail.com',cc: 'malleswar.mca@gmail.com'
+                       recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']],
 //                        recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
                     )
                 } catch (Exception e) {
