@@ -124,7 +124,6 @@ pipeline {
                         """,
                        mimeType: 'text/html',
                        to: 'malleswar.mca@gmail.com',cc: 'malleswar.mca@gmail.com'
-                       recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']],
 //                        recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
                     )
                 } catch (Exception e) {
