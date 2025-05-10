@@ -122,9 +122,11 @@ pipeline {
                             <p><a href="${env.BUILD_URL}testReport">View Test Reports</a></p>
                             <p><a href="${env.BUILD_URL}console">View Console Output</a></p>
                         """,
-                        to: 'malleswar.mca@gmail.com',
-                        mimeType: 'text/html',
-                        attachLog: false
+                       to: 'malleswar.mca@gmail.com',
+                       mimeType: 'text/html',
+                       attachLog: false,
+                       useDefaultRecipients: false,
+                       useList: false
                     )
                 } catch (Exception e) {
                     echo "Failed to send email: ${e.message}"
