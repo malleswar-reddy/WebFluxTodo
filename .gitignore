@@ -31,3 +31,9 @@ replay_pid*
 */build/test-results/*
 */build/jacoco/test.exec
 /Learn-Readme/Learn-Readme.iml
+/.idea/.gitignore
+/.idea/aws.xml
+/.idea/compiler.xml
+/.idea/gradle.xml
+/.idea/misc.xml
+/.idea/vcs.xml

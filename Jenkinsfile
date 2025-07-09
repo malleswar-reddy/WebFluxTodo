@@ -1,7 +1,8 @@
 pipeline {
     agent any
+
     tools {
-        jdk 'JDK' // Must match the name in Global Tool Configuration
+        jdk 'JDK' // Match name from Global Tool Configuration
     }
 
     environment {
@@ -14,9 +15,9 @@ pipeline {
             steps {
                 script {
                     try {
-                        git url: 'https://github.com/malleswar-reddy/WebFluxTodo.git', branch: 'devlop'
+                        git url: 'https://github.com/malleswar-reddy/WebFluxTodo.git', branch: "${env.BRANCH_NAME}"
                     } catch (Exception e) {
-                        error "Failed to checkout branch 'devlop': ${e.message}"
+                        error "Failed to checkout branch '${env.BRANCH_NAME}': ${e.message}"
                     }
                 }
             }
@@ -53,6 +54,19 @@ pipeline {
             steps {
                 sh './gradlew bootJar --no-daemon'
                 archiveArtifacts artifacts: '**/build/libs/*.jar', fingerprint: true
+            }
+        }
+
+        stage('Deploy') {
+            when {
+                branch 'dev'
+            }
+            steps {
+                echo "Deploying dev branch build..."
+                sh '''
+                    echo "Simulated deployment to dev server"
+                    # Example: scp target to server or run docker/k8s commands
+                '''
             }
         }
     }
@@ -108,10 +122,11 @@ pipeline {
 
                 try {
                     emailext(
-                        subject: "Jenkins Build todo ${currentBuild.currentResult}: Job ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                        subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                         body: """
                             <h2>Build Status: ${currentBuild.currentResult}</h2>
                             <p><strong>Job:</strong> ${env.JOB_NAME}</p>
+                            <p><strong>Branch:</strong> ${env.BRANCH_NAME}</p>
                             <p><strong>Build Number:</strong> ${env.BUILD_NUMBER}</p>
                             <p><strong>Duration:</strong> ${currentBuild.durationString}</p>
                             <h3>JaCoCo Test Coverage</h3>
@@ -122,9 +137,8 @@ pipeline {
                             <p><a href="${env.BUILD_URL}testReport">View Test Reports</a></p>
                             <p><a href="${env.BUILD_URL}console">View Console Output</a></p>
                         """,
-                       mimeType: 'text/html',
-                       to: 'malleswar.mca@gmail.com',cc: 'malleswar.mca@gmail.com'
-//                        recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
+                        mimeType: 'text/html',
+                        to: 'malleswar.mca@gmail.com', cc: 'malleswar.mca@gmail.com'
                     )
                 } catch (Exception e) {
                     echo "Failed to send email: ${e.message}"
@@ -134,6 +148,3 @@ pipeline {
         }
     }
 }
-//attachmentsPattern: 'CommonService/build/reports/jacoco/test/html/index.html,UserManagement/build/reports/tests/test/index.html'
-
-// Helper function to extract JaCoCo line coverage
