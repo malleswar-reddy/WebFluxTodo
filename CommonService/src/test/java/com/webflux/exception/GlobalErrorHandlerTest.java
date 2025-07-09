@@ -75,6 +75,7 @@ class GlobalErrorHandlerTest {
     void handle_objectMapperFailure() throws JsonProcessingException {
         when(exchange.getResponse()).thenReturn(response);
         when(response.getHeaders()).thenReturn(new HttpHeaders());
+        
 //        when(response.bufferFactory()).thenReturn(dataBufferFactory);
 
         Throwable exception = new RuntimeException("Resource not found");
